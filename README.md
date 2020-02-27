@@ -1,4 +1,4 @@
-# rise-embedded-template 
+# rise-embedded-template [![Coverage Status](https://coveralls.io/repos/github/Rise-Vision/rise-embedded-template/badge.svg?branch=master)](https://coveralls.io/github/Rise-Vision/rise-embedded-template?branch=master)
 
 `rise-embedded-template` is a Polymer 3 Web Component that renders a Rise Template presenation
 
