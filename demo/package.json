@@ -1,0 +1,9 @@
+{
+  "name": "rise-embedded-template-demo",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@polymer/polymer": "3.1.0",
+    "@webcomponents/webcomponentsjs": "^2.1.3"
+  }
+}

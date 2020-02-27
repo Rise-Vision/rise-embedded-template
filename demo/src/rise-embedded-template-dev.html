@@ -1,0 +1,65 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://widgets.risevision.com/beta/common/config-test.min.js"></script>
+  <script src="https://widgets.risevision.com/beta/common/common-template.min.js"></script>
+  <script src="../../src/rise-embedded-template.js" type="module"></script>
+  <script>
+    if (document.domain.indexOf("localhost") === -1) {
+      try {
+        document.domain = "risevision.com";
+      } catch (err) {
+        // can't set document.domain, risevision.com not an accepted suffix of current document domain
+        console.log("document.domain can't be set", err);
+      }
+    }
+  </script>
+  <style type="text/css">
+    #container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    rise-embedded-template {
+      width: 1920px;
+      height: 1080px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="container">
+    <rise-embedded-template
+      id="first"
+      template-id="8d517e618b10991a995e53e334f707fc246de9cc">
+    </rise-embedded-template>
+  </div>
+
+  <script>
+    function configureComponents() {
+      console.log('Rise components ready');
+    }
+
+    window.addEventListener( "rise-components-ready", configureComponents );
+
+    // Demonstrating how to handle no connection to local messaging via listening for event
+    // Note: the connection can also be checked via RisePlayerConfiguration.LocalMessaging.isConnected()
+    window.addEventListener( "rise-local-messaging-connection", event => {
+      if ( !event.detail.isConnected ) {
+        console.log( "no connection to local messaging");
+      }
+    } );
+
+    Array.from(document.getElementsByTagName('rise-embedded-template')).forEach(element => RisePlayerConfiguration.Helpers.sendStartEvent(element));
+  </script>
+  <script>
+    RisePlayerConfiguration.configure();
+  </script>
+
+</body>
+</html>
