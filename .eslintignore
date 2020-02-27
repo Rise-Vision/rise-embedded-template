@@ -1,0 +1,7 @@
+demo/node_modules/**
+demo/build
+node_modules/**
+build
+dist
+src/config.js
+coverage

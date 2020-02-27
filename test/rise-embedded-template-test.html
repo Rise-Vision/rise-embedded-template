@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>rise-embedded-template test</title>
+
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../node_modules/@polymer/test-fixture/test-fixture.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/wct-mocha/wct-mocha.js"></script>
+    <script src="../node_modules/sinon/pkg/sinon.js"></script>
+
+    <script type="text/javascript">
+      RisePlayerConfiguration = {
+        isConfigured: () => true,
+        isPreview: sinon.stub().returns(true),
+        Logger: {}
+      };
+    </script>
+
+    <script type="module" src="../src/rise-embedded-template.js"></script>
+  </head>
+  <body>
+
+    <test-fixture id="StaticValueTestFixture">
+      <template>
+        <rise-embedded-template template-id="8d517e618b10991a995e53e334f707fc246de9cc">
+        </rise-embedded-template>
+      </template>
+    </test-fixture>
+
+    <script type="module">
+      suite('rise-embedded-template', () => {
+        const sandbox = sinon.createSandbox();
+
+        setup(()=>{
+          RisePlayerConfiguration.Logger.info = sandbox.spy();
+          RisePlayerConfiguration.Logger.warning = sandbox.spy();
+          RisePlayerConfiguration.Logger.error = sandbox.spy();
+        });
+
+        teardown(()=>{
+          RisePlayerConfiguration.Logger = {};
+          sandbox.restore();
+        });
+
+        test('should set template url', () => {
+          const element = fixture('StaticValueTestFixture');
+
+          assert.equal(element.url, 'https://widgets.risevision.com/stable/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html');
+        });
+
+        test('should render iframe with template url', () => {
+          const element = fixture('StaticValueTestFixture');
+          const object = element.shadowRoot.children[0];
+
+          assert.equal(object.tagName, "IFRAME");
+          assert.equal(object.src, element.url);
+        });
+
+        test('should load blank url when template-id is cleared', () => {
+          const element = fixture('StaticValueTestFixture');
+          const object = element.shadowRoot.children[0];
+
+          element.templateId = "";
+          assert.equal(object.src, "about:blank");
+        });
+
+      });
+    </script>
+
+  </body>
+</html>
