@@ -14,8 +14,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
         allowTransparency="true"
         allowfullscreen="true"
         mozallowfullscreen="true"
-        webkitallowfullscreen="true"
-        sandbox="allow-forms allow-same-origin allow-scripts allow-presentation">
+        webkitallowfullscreen="true">
       </iframe>
     `;
   }
