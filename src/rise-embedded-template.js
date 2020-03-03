@@ -25,10 +25,13 @@ export default class RiseEmbeddedTemplate extends RiseElement {
       templateId: {
         type: String
       },
+      presentationId: {
+        type: String
+      },
       url: {
         type: String,
         readOnly: true,
-        computed: "_computeUrl(templateId)"
+        computed: "_computeUrl(templateId, presentationId)"
       }
     }
   }
@@ -39,13 +42,25 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     this._setVersion( version );
   }
 
-  _computeUrl(templateId) {
+  _computeUrl(templateId, presentationId) {
 
     if (!templateId) {
       return "about:blank";
     }
 
-    return `https://widgets.risevision.com/stable/templates/${templateId}/src/template.html`;
+    const templateStage = this._getHostTemplatePath().startsWith("/staging") ? "staging" : "stable";
+
+    let url = `https://widgets.risevision.com/${templateStage}/templates/${templateId}/src/template.html`
+
+    if (presentationId) {
+      url = `${url}?presentationId=${presentationId}`;
+    }
+
+    return url;
+  }
+
+  _getHostTemplatePath() {
+    return window.location.pathname;
   }
 }
 
