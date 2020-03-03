@@ -7,7 +7,8 @@
 ```
   <rise-embedded-template
     id="template"
-    template-id="5afded33-2739-4532-9e22-a2235a5bc8c2">
+    template-id="8d517e618b10991a995e53e334f707fc246de9cc"
+    presentation-id="25aa133d-d453-475b-a64a-efd165deef4b">
   </rise-embedded-template>
 ```
 
@@ -21,7 +22,8 @@ This attribute holds a literal value, for example:
   <rise-embedded-template
     id="template"
     label="Embedded Template"
-    template-id="5afded33-2739-4532-9e22-a2235a5bc8c2">
+    template-id="8d517e618b10991a995e53e334f707fc246de9cc"
+    presentation-id="25aa133d-d453-475b-a64a-efd165deef4b">
   </rise-embedded-template>
 ```
 
@@ -33,6 +35,7 @@ This component receives the following list of attributes:
 
 - **id**: ( string / required ): Unique HTMLElement id.
 - **template-id**: ( string / required ): HTML Template id.
+- **presentation-id**: ( string / no ): HTML Template instance presentation id. The template is loaded with the default values if this attribute is absent.
 - **label**: ( string / optional ): An optional label key for the text that will appear in the template editor. See 'Labels' section above.
 - **non-editable**: ( empty / optional ): If present, it indicates this component is not available for customization in the template editor.
 
