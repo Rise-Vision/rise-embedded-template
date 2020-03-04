@@ -7,6 +7,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   static get template() {
     return html`
       <iframe
+        id="template"
         height="100%"
         width="100%"
         src="[[url]]"
@@ -60,6 +61,17 @@ export default class RiseEmbeddedTemplate extends RiseElement {
 
   _getHostTemplatePath() {
     return window.location.pathname;
+  }
+
+  ready() {
+    super.ready();
+
+    this.addEventListener("rise-playlist-play", () => this._sendMessageToTemplate({ topic: "rise-presentation-play" }));
+    this.addEventListener("rise-playlist-stop", () => this._sendMessageToTemplate({ topic: "rise-presentation-stop" }));
+  }
+
+  _sendMessageToTemplate(message) {
+    this.$.template.contentWindow.postMessage(message, this.url);
   }
 }
 
