@@ -107,6 +107,21 @@
           assert.equal(element._sendMessageToTemplate.calledWith({ topic: "rise-presentation-stop" }), true);
         });
 
+        test('should send "report-done" event when template is done', (done) => {
+          const element = fixture('StaticValueTestFixture');
+          const iframe = element.shadowRoot.children[0];
+
+          element.addEventListener("report-done", () => {
+            done();
+          });
+
+          const event = new Event("message");
+          event.data = { topic: "template-done" };
+          event.source = iframe.contentWindow;
+
+          element._handleMessageFromTemplate(event);
+        });
+
       });
     </script>
 

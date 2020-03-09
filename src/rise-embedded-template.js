@@ -68,10 +68,22 @@ export default class RiseEmbeddedTemplate extends RiseElement {
 
     this.addEventListener("rise-playlist-play", () => this._sendMessageToTemplate({ topic: "rise-presentation-play" }));
     this.addEventListener("rise-playlist-stop", () => this._sendMessageToTemplate({ topic: "rise-presentation-stop" }));
+
+    window.addEventListener("message", event => this._handleMessageFromTemplate(event), false);
   }
 
   _sendMessageToTemplate(message) {
     this.$.template.contentWindow.postMessage(message, this.url);
+  }
+
+  _handleMessageFromTemplate(event) {
+    if (event.source !== this.$.template.contentWindow) {
+      return;
+    }
+
+    if (event.data.topic === "template-done") {
+      super._sendDoneEvent(true);
+    }
   }
 }
 
