@@ -33,6 +33,8 @@
     </test-fixture>
 
     <script type="module">
+      import { RiseElement } from "rise-common-component/src/rise-element.js";
+
       suite('rise-embedded-template', () => {
         const sandbox = sinon.createSandbox();
 
@@ -105,6 +107,54 @@
           element.dispatchEvent(new Event("rise-playlist-stop"));
 
           assert.equal(element._sendMessageToTemplate.calledWith({ topic: "rise-presentation-stop" }), true);
+        });
+
+        test('should send "report-done" event when template is done', () => {
+          // stub super class method
+          sandbox.stub(RiseElement.prototype, "_sendDoneEvent");
+
+          const element = fixture('StaticValueTestFixture');
+          const iframe = element.shadowRoot.children[0];
+
+          const event = new Event("message");
+          event.data = { topic: "template-done" };
+          event.source = iframe.contentWindow;
+
+          element._handleMessageFromTemplate(event);
+
+          assert.equal(element._sendDoneEvent.called, true);
+        });
+
+        test('should not send "report-done" event when "template-done" message is from a different source', () => {
+          // stub super class method
+          sandbox.stub(RiseElement.prototype, "_sendDoneEvent");
+
+          const element = fixture('StaticValueTestFixture');
+          const iframe = element.shadowRoot.children[0];
+
+          const event = new Event("message");
+          event.data = { topic: "template-done" };
+          event.source = {};
+
+          element._handleMessageFromTemplate(event);
+
+          assert.equal(element._sendDoneEvent.called, false);
+        });
+
+        test('should not send "report-done" event when message is not "template-done"', () => {
+          // stub super class method
+          sandbox.stub(RiseElement.prototype, "_sendDoneEvent");
+
+          const element = fixture('StaticValueTestFixture');
+          const iframe = element.shadowRoot.children[0];
+
+          const event = new Event("message");
+          event.data = { topic: "other-topic" };
+          event.source = iframe.contentWindow;
+
+          element._handleMessageFromTemplate(event);
+
+          assert.equal(element._sendDoneEvent.called, false);
         });
 
       });
