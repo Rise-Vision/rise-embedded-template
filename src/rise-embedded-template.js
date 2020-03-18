@@ -50,13 +50,19 @@ export default class RiseEmbeddedTemplate extends RiseElement {
 
     const templateStage = this._getHostTemplatePath().startsWith("/staging") ? "staging" : "stable";
 
-    let url = `https://widgets.risevision.com/${templateStage}/templates/${templateId}/src/template.html`
+    const protocol = this._getHostTemplateProtocol();
+
+    let url = `${protocol}//widgets.risevision.com/${templateStage}/templates/${templateId}/src/template.html`
 
     if (presentationId) {
       url = `${url}?presentationId=${presentationId}`;
     }
 
     return url;
+  }
+
+  _getHostTemplateProtocol() {
+    return window.location.protocol;
   }
 
   _getHostTemplatePath() {

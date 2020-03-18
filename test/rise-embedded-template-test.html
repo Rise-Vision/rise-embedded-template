@@ -52,7 +52,7 @@
         test('should set template url', () => {
           const element = fixture('StaticValueTestFixture');
 
-          assert.equal(element.url, 'https://widgets.risevision.com/stable/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html');
+          assert.equal(element.url, 'http://widgets.risevision.com/stable/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html');
         });
 
         test('should set presentation id parameter in the template URL', () => {
@@ -60,7 +60,7 @@
 
           element.presentationId = "25aa133d-d453-475b-a64a-efd165deef4b";
 
-          assert.equal(element.url, 'https://widgets.risevision.com/stable/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b');
+          assert.equal(element.url, 'http://widgets.risevision.com/stable/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b');
         });
 
         test('should load template from staging if host template is also on staging', () => {
@@ -70,8 +70,20 @@
 
           element.presentationId = "25aa133d-d453-475b-a64a-efd165deef4b";
 
+          assert.equal(element.url, 'http://widgets.risevision.com/staging/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b');
+        });
+
+        test('should load template from https if host template is also on https', () => {
+          const element = fixture('StaticValueTestFixture');
+
+          sandbox.stub(element, "_getHostTemplatePath").returns("/staging/templates/6fb889c4dd821ad7092ff7b68e70cbdef9ccfa51/src/template.html");
+          sandbox.stub(element, "_getHostTemplateProtocol").returns("https:");
+
+          element.presentationId = "25aa133d-d453-475b-a64a-efd165deef4b";
+
           assert.equal(element.url, 'https://widgets.risevision.com/staging/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b');
         });
+
 
         test('should render iframe with template url', () => {
           const element = fixture('StaticValueTestFixture');
