@@ -40,6 +40,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     super();
 
     this._setVersion( version );
+    this._templateIsReady = false;
   }
 
   _computeUrl(templateId, presentationId) {
@@ -72,10 +73,22 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   ready() {
     super.ready();
 
-    this.addEventListener("rise-playlist-play", () => this._sendMessageToTemplate({ topic: "rise-presentation-play" }));
-    this.addEventListener("rise-playlist-stop", () => this._sendMessageToTemplate({ topic: "rise-presentation-stop" }));
+    this.addEventListener("rise-playlist-play", () => this._play());
+    this.addEventListener("rise-playlist-stop", () => this._stop());
 
     window.addEventListener("message", event => this._handleMessageFromTemplate(event), false);
+  }
+
+  _play() {
+    if (this._templateIsReady) {
+      this._sendMessageToTemplate({ topic: "rise-presentation-play" })
+    }
+  }
+
+  _stop() {
+    if (this._templateIsReady) {
+      this._sendMessageToTemplate({ topic: "rise-presentation-stop" })
+    }
   }
 
   _sendMessageToTemplate(message) {
@@ -89,6 +102,11 @@ export default class RiseEmbeddedTemplate extends RiseElement {
 
     if (event.data.topic === "template-done") {
       super._sendDoneEvent(true);
+    }
+
+    if (event.data.topic === "rise-components-ready") {
+      this._templateIsReady = true;
+      this._sendEvent("rise-components-ready");
     }
   }
 }
