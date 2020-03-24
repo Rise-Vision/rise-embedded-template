@@ -106,6 +106,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
 
     if (event.data.topic === "rise-components-ready") {
       this._templateIsReady = true;
+      this._sendEvent("rise-components-ready");
     }
   }
 }

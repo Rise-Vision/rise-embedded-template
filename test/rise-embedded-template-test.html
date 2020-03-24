@@ -200,6 +200,22 @@
           assert.equal(element._sendDoneEvent.called, false);
         });
 
+        test('should send "rise-components-ready" event when template sends it', () => {
+          // stub super class method
+          sandbox.stub(RiseElement.prototype, "_sendEvent");
+
+          const element = fixture('StaticValueTestFixture');
+          const iframe = element.shadowRoot.children[0];
+
+          const event = new Event("message");
+          event.data = { topic: "rise-components-ready" };
+          event.source = iframe.contentWindow;
+
+          element._handleMessageFromTemplate(event);
+
+          assert.equal(element._sendEvent.calledWith("rise-components-ready"), true);
+        });
+
       });
     </script>
 
