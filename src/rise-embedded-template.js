@@ -3,7 +3,6 @@ import { RiseElement } from "rise-common-component/src/rise-element.js";
 import { version } from "./rise-embedded-template-version.js";
 
 export default class RiseEmbeddedTemplate extends RiseElement {
-
   static get template() {
     return html`
       <iframe
@@ -32,6 +31,11 @@ export default class RiseEmbeddedTemplate extends RiseElement {
         type: String,
         readOnly: true,
         computed: "_computeUrl(templateId, presentationId)"
+      },
+      _MAX_EMBED_LEVEL: {
+        type: Number,
+        readOnly: true,
+        value: 5
       }
     }
   }
@@ -41,12 +45,17 @@ export default class RiseEmbeddedTemplate extends RiseElement {
 
     this._setVersion( version );
     this._templateIsReady = false;
+    this._currentLevelOfEmbedding = this._getLevelOfEmbedding();
   }
 
   _computeUrl(templateId, presentationId) {
 
     if (!templateId) {
       return "about:blank";
+    }
+
+    if (this._currentLevelOfEmbedding >= this._MAX_EMBED_LEVEL) {
+      return "data:text/html;charset=utf-8,<html><body>Maximum level of embedding is reached</body></html>";
     }
 
     const templateStage = this._getHostTemplatePath().startsWith("/staging") ? "staging" : "stable";
@@ -68,6 +77,17 @@ export default class RiseEmbeddedTemplate extends RiseElement {
 
   _getHostTemplatePath() {
     return window.location.pathname;
+  }
+
+  _getLevelOfEmbedding(currentWindow, currentLevel) {
+    currentLevel = currentLevel || 0;
+    currentWindow = currentWindow || window.self;
+
+    if (window.top != currentWindow && currentWindow.parent && currentLevel < this._MAX_EMBED_LEVEL) {
+      return this._getLevelOfEmbedding(currentWindow.parent, currentLevel + 1);
+    } else {
+      return currentLevel;
+    }
   }
 
   ready() {
