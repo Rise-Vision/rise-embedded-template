@@ -21,7 +21,6 @@
       };
     </script>
 
-    <script type="module" src="../src/rise-embedded-template.js"></script>
   </head>
   <body>
 
@@ -34,6 +33,7 @@
 
     <script type="module">
       import { RiseElement } from "rise-common-component/src/rise-element.js";
+      import RiseEmbeddedTemplate from "../src/rise-embedded-template.js";
 
       suite('rise-embedded-template', () => {
         const sandbox = sinon.createSandbox();
@@ -214,6 +214,49 @@
           element._handleMessageFromTemplate(event);
 
           assert.equal(element._sendEvent.calledWith("rise-components-ready"), true);
+        });
+
+        test('should calculate level of embedding correctly', () => {
+          const element = fixture('StaticValueTestFixture');
+
+          let topWindow = {};
+          let sampleWindowFixture = {  //level 2
+            top: topWindow,
+            parent: { //level 1
+              parent: topWindow //level 0
+            } 
+          };
+
+          let level = element._getLevelOfEmbedding(sampleWindowFixture);
+
+          assert.equal(level, 2);
+        });
+
+        test('should not exceed maximum level of embedding', () => {
+          const element = fixture('StaticValueTestFixture');
+
+          let topWindow = {};
+          let sampleWindowFixture = {};
+          //create circular reference so simulate indefine nesting
+          sampleWindowFixture.parent = sampleWindowFixture;
+
+          let level = element._getLevelOfEmbedding(sampleWindowFixture);
+
+          assert.equal(level, RiseEmbeddedTemplate.MAX_EMBED_LEVEL);
+        });
+
+        test('should set _currentLevelOfEmbedding in constructor', () => {
+          const element = fixture('StaticValueTestFixture');
+
+          assert.exists(element._currentLevelOfEmbedding);
+          assert.isAbove(element._currentLevelOfEmbedding, 0);
+        });
+
+        test('should show static message wen maximum level of embedding is reached', () => {
+          sinon.stub(RiseEmbeddedTemplate, 'MAX_EMBED_LEVEL').get(() => 1);
+          const element = fixture('StaticValueTestFixture');
+
+          assert.equal(element.url, 'data:text/html;charset=utf-8,<html><body>Maximum level of embedding is reached</body></html>');
         });
 
       });
