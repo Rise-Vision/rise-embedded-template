@@ -21,7 +21,6 @@
       };
     </script>
 
-    <script type="module" src="../src/rise-embedded-template.js"></script>
   </head>
   <body>
 
@@ -32,15 +31,9 @@
       </template>
     </test-fixture>
 
-    <test-fixture id="MaxLevelFixture">
-      <template>
-        <rise-embedded-template template-id="8d517e618b10991a995e53e334f707fc246de9cc" _MAX_EMBED_LEVEL=1>
-        </rise-embedded-template>
-      </template>
-    </test-fixture>
-
     <script type="module">
       import { RiseElement } from "rise-common-component/src/rise-element.js";
+      import RiseEmbeddedTemplate from "../src/rise-embedded-template.js";
 
       suite('rise-embedded-template', () => {
         const sandbox = sinon.createSandbox();
@@ -249,7 +242,7 @@
 
           let level = element._getLevelOfEmbedding(sampleWindowFixture);
 
-          assert.equal(level, element._MAX_EMBED_LEVEL);
+          assert.equal(level, RiseEmbeddedTemplate.MAX_EMBED_LEVEL);
         });
 
         test('should set _currentLevelOfEmbedding in constructor', () => {
@@ -260,10 +253,8 @@
         });
 
         test('should show static message wen maximum level of embedding is reached', () => {
-          const element = fixture('MaxLevelFixture');
-
-          element._currentLevelOfEmbedding = element._MAX_EMBED_LEVEL;
-          element.templateId = '123'; //trigger re-calculation of URL
+          sinon.stub(RiseEmbeddedTemplate, 'MAX_EMBED_LEVEL').get(() => 1);
+          const element = fixture('StaticValueTestFixture');
 
           assert.equal(element.url, 'data:text/html;charset=utf-8,<html><body>Maximum level of embedding is reached</body></html>');
         });

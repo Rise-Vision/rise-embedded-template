@@ -31,13 +31,12 @@ export default class RiseEmbeddedTemplate extends RiseElement {
         type: String,
         readOnly: true,
         computed: "_computeUrl(templateId, presentationId)"
-      },
-      _MAX_EMBED_LEVEL: {
-        type: Number,
-        readOnly: true,
-        value: 5
       }
     }
+  }
+
+  static get MAX_EMBED_LEVEL() {
+    return 5;
   }
 
   constructor() {
@@ -54,7 +53,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
       return "about:blank";
     }
 
-    if (this._currentLevelOfEmbedding >= this._MAX_EMBED_LEVEL) {
+    if (this._currentLevelOfEmbedding >= RiseEmbeddedTemplate.MAX_EMBED_LEVEL) {
       return "data:text/html;charset=utf-8,<html><body>Maximum level of embedding is reached</body></html>";
     }
 
@@ -83,7 +82,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     currentLevel = currentLevel || 0;
     currentWindow = currentWindow || window.self;
 
-    if (window.top != currentWindow && currentWindow.parent && currentLevel < this._MAX_EMBED_LEVEL) {
+    if (window.top != currentWindow && currentWindow.parent && currentLevel < RiseEmbeddedTemplate.MAX_EMBED_LEVEL) {
       return this._getLevelOfEmbedding(currentWindow.parent, currentLevel + 1);
     } else {
       return currentLevel;
