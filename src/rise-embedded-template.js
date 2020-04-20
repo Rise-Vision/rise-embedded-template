@@ -65,7 +65,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     let url = `${protocol}//widgets.risevision.com/${templateStage}/templates/${templateId}/src/template.html`
 
     if (presentationId) {
-      url = `${url}?presentationId=${presentationId}&type=${type}`;
+      url = `${url}?presentationId=${presentationId}&type=${type}&frameElementId=template_${presentationId}`;
     }
 
     return url;

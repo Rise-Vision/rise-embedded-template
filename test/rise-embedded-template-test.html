@@ -60,7 +60,7 @@
 
           element.presentationId = "25aa133d-d453-475b-a64a-efd165deef4b";
 
-          assert.equal(element.url, 'http://widgets.risevision.com/stable/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b&type=null');
+          assert.equal(element.url, 'http://widgets.risevision.com/stable/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b&type=null&frameElementId=template_25aa133d-d453-475b-a64a-efd165deef4b');
         });
 
         test('should load template from staging if host template is also on staging', () => {
@@ -70,7 +70,7 @@
 
           element.presentationId = "25aa133d-d453-475b-a64a-efd165deef4b";
 
-          assert.equal(element.url, 'http://widgets.risevision.com/staging/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b&type=null');
+          assert.equal(element.url, 'http://widgets.risevision.com/staging/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b&type=null&frameElementId=template_25aa133d-d453-475b-a64a-efd165deef4b');
         });
 
         test('should load template from https if host template is also on https', () => {
@@ -81,7 +81,7 @@
 
           element.presentationId = "25aa133d-d453-475b-a64a-efd165deef4b";
 
-          assert.equal(element.url, 'https://widgets.risevision.com/staging/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b&type=null');
+          assert.equal(element.url, 'https://widgets.risevision.com/staging/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b&type=null&frameElementId=template_25aa133d-d453-475b-a64a-efd165deef4b');
         });
 
         test('should render iframe with template url', () => {
