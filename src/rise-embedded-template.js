@@ -112,7 +112,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   }
 
   _sendMessageToTemplate(message) {
-    console.log(`${this.id} sending ${message.topic} to template`);
+    console.log(`${this.id} sending ${message.topic || message.type} to template`);
     this.$.template.contentWindow.postMessage(message, this.url);
   }
 
@@ -120,7 +120,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     if (event.source === this.$.template.contentWindow) {
       this._handleMessageFromTemplate(event);
     } else if (this.$.template.contentWindow && event.data && 
-      (event.data.type === "attributeData" || event.data.type === "displayData")) {
+      (event.data.type === "attributeData" || event.data.type === "displayData" || event.data.type === "sendStartEvent")) {
       this._sendMessageToTemplate( event.data );
     }
   }
