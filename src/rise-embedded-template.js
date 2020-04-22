@@ -110,7 +110,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     this.addEventListener("rise-playlist-play", () => this._play());
     this.addEventListener("rise-playlist-stop", () => this._stop());
 
-    window.addEventListener("message", event => this._handleMessageFromTemplate(event), false);
+    window.addEventListener("message", event => this._handleMessage(event), false);
   }
 
   _play() {
@@ -129,11 +129,16 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     this.$.template.contentWindow.postMessage(message, this.url);
   }
 
-  _handleMessageFromTemplate(event) {
-    if (event.source !== this.$.template.contentWindow) {
-      return;
+  _handleMessage(event) {
+    if (event.source === this.$.template.contentWindow) {
+      this._handleMessageFromTemplate(event);
+    } else if (this.$.template.contentWindow && event.data && 
+      (event.data.type === "attributeData" || event.data.type === "displayData")) {
+      this.$.template.contentWindow.postMessage( event.data, this.url);  
     }
+  }
 
+  _handleMessageFromTemplate(event) {
     if (event.data.topic === "template-done") {
       super._sendDoneEvent(true);
     }
@@ -141,6 +146,10 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     if (event.data.topic === "rise-components-ready") {
       this._templateIsReady = true;
       this._sendEvent("rise-components-ready");
+    }
+
+    if (event.data.topic === "template-error") {
+      this._sendEvent("rise-components-error");
     }
   }
 }
