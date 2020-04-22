@@ -121,7 +121,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
       this._handleMessageFromTemplate(event);
     } else if (this.$.template.contentWindow && event.data && 
       (event.data.type === "attributeData" || event.data.type === "displayData")) {
-      this.$.template.contentWindow.postMessage( event.data, this.url);  
+      this._sendMessageToTemplate( event.data );
     }
   }
 
