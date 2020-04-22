@@ -60,7 +60,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     const templateStage = this._getHostTemplatePath().startsWith("/staging") ? "staging" : "stable";
 
     const protocol = this._getHostTemplateProtocol();
-    const type = this._getHttpParameter("type");
+    const type = RisePlayerConfiguration.Helpers.getHttpParameter("type");
 
     let url = `${protocol}//widgets.risevision.com/${templateStage}/templates/${templateId}/src/template.html`
 
@@ -77,20 +77,6 @@ export default class RiseEmbeddedTemplate extends RiseElement {
 
   _getHostTemplatePath() {
     return window.location.pathname;
-  }
-
-  _getHttpParameter( name ) {
-    try {
-      const href = window.location.href;
-      const regex = new RegExp( `[?&]${ name }=([^&#]*)`, "i" );
-      const match = regex.exec( href );
-
-      return match ? match[ 1 ] : null;
-    } catch ( err ) {
-      console.log( "can't retrieve HTTP parameter", err );
-
-      return null;
-    }
   }
 
   _getLevelOfEmbedding(currentWindow, currentLevel) {
