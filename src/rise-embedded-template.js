@@ -126,6 +126,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   }
 
   _sendMessageToTemplate(message) {
+    console.log(`${this.id} sending ${message.topic} to template`);
     this.$.template.contentWindow.postMessage(message, this.url);
   }
 
@@ -139,6 +140,8 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   }
 
   _handleMessageFromTemplate(event) {
+    console.log(`${this.id} received ${event.data.topic} from template`);
+
     if (event.data.topic === "template-done") {
       super._sendDoneEvent(true);
     }
