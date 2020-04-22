@@ -107,7 +107,7 @@
           const event = new Event("message");
           event.data = { topic: "rise-components-ready" };
           event.source = iframe.contentWindow;
-          element._handleMessageFromTemplate(event);
+          element._handleMessage(event);
 
           sandbox.stub(element, "_sendMessageToTemplate");
 
@@ -123,7 +123,7 @@
           const event = new Event("message");
           event.data = { topic: "rise-components-ready" };
           event.source = iframe.contentWindow;
-          element._handleMessageFromTemplate(event);
+          element._handleMessage(event);
 
           sandbox.stub(element, "_sendMessageToTemplate");
 
@@ -163,7 +163,7 @@
           event.data = { topic: "template-done" };
           event.source = iframe.contentWindow;
 
-          element._handleMessageFromTemplate(event);
+          element._handleMessage(event);
 
           assert.equal(element._sendDoneEvent.called, true);
         });
@@ -179,7 +179,7 @@
           event.data = { topic: "template-done" };
           event.source = {};
 
-          element._handleMessageFromTemplate(event);
+          element._handleMessage(event);
 
           assert.equal(element._sendDoneEvent.called, false);
         });
@@ -195,7 +195,7 @@
           event.data = { topic: "other-topic" };
           event.source = iframe.contentWindow;
 
-          element._handleMessageFromTemplate(event);
+          element._handleMessage(event);
 
           assert.equal(element._sendDoneEvent.called, false);
         });
@@ -211,7 +211,7 @@
           event.data = { topic: "rise-components-ready" };
           event.source = iframe.contentWindow;
 
-          element._handleMessageFromTemplate(event);
+          element._handleMessage(event);
 
           assert.equal(element._sendEvent.calledWith("rise-components-ready"), true);
         });
