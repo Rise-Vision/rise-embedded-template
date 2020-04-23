@@ -17,7 +17,10 @@
       RisePlayerConfiguration = {
         isConfigured: () => true,
         isPreview: sinon.stub().returns(true),
-        Logger: {}
+        Logger: {},
+        Helpers: {
+          getHttpParameter: sinon.stub().returns("type")
+        }
       };
     </script>
 
@@ -60,7 +63,7 @@
 
           element.presentationId = "25aa133d-d453-475b-a64a-efd165deef4b";
 
-          assert.equal(element.url, 'http://widgets.risevision.com/stable/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b');
+          assert.equal(element.url, 'http://widgets.risevision.com/stable/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b&type=type&frameElementId=template_25aa133d-d453-475b-a64a-efd165deef4b');
         });
 
         test('should load template from staging if host template is also on staging', () => {
@@ -70,7 +73,7 @@
 
           element.presentationId = "25aa133d-d453-475b-a64a-efd165deef4b";
 
-          assert.equal(element.url, 'http://widgets.risevision.com/staging/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b');
+          assert.equal(element.url, 'http://widgets.risevision.com/staging/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b&type=type&frameElementId=template_25aa133d-d453-475b-a64a-efd165deef4b');
         });
 
         test('should load template from https if host template is also on https', () => {
@@ -81,7 +84,7 @@
 
           element.presentationId = "25aa133d-d453-475b-a64a-efd165deef4b";
 
-          assert.equal(element.url, 'https://widgets.risevision.com/staging/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b');
+          assert.equal(element.url, 'https://widgets.risevision.com/staging/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html?presentationId=25aa133d-d453-475b-a64a-efd165deef4b&type=type&frameElementId=template_25aa133d-d453-475b-a64a-efd165deef4b');
         });
 
         test('should render iframe with template url', () => {
@@ -107,7 +110,7 @@
           const event = new Event("message");
           event.data = { topic: "rise-components-ready" };
           event.source = iframe.contentWindow;
-          element._handleMessageFromTemplate(event);
+          element._handleMessage(event);
 
           sandbox.stub(element, "_sendMessageToTemplate");
 
@@ -123,7 +126,7 @@
           const event = new Event("message");
           event.data = { topic: "rise-components-ready" };
           event.source = iframe.contentWindow;
-          element._handleMessageFromTemplate(event);
+          element._handleMessage(event);
 
           sandbox.stub(element, "_sendMessageToTemplate");
 
@@ -163,25 +166,9 @@
           event.data = { topic: "template-done" };
           event.source = iframe.contentWindow;
 
-          element._handleMessageFromTemplate(event);
+          element._handleMessage(event);
 
           assert.equal(element._sendDoneEvent.called, true);
-        });
-
-        test('should not send "report-done" event when "template-done" message is from a different source', () => {
-          // stub super class method
-          sandbox.stub(RiseElement.prototype, "_sendDoneEvent");
-
-          const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
-
-          const event = new Event("message");
-          event.data = { topic: "template-done" };
-          event.source = {};
-
-          element._handleMessageFromTemplate(event);
-
-          assert.equal(element._sendDoneEvent.called, false);
         });
 
         test('should not send "report-done" event when message is not "template-done"', () => {
@@ -195,7 +182,7 @@
           event.data = { topic: "other-topic" };
           event.source = iframe.contentWindow;
 
-          element._handleMessageFromTemplate(event);
+          element._handleMessage(event);
 
           assert.equal(element._sendDoneEvent.called, false);
         });
@@ -211,9 +198,100 @@
           event.data = { topic: "rise-components-ready" };
           event.source = iframe.contentWindow;
 
-          element._handleMessageFromTemplate(event);
+          element._handleMessage(event);
 
           assert.equal(element._sendEvent.calledWith("rise-components-ready"), true);
+        });
+
+        test('should send "rise-components-error" event when template sends it', () => {
+          // stub super class method
+          sandbox.stub(RiseElement.prototype, "_sendEvent");
+
+          const element = fixture('StaticValueTestFixture');
+          const iframe = element.shadowRoot.children[0];
+
+          const event = new Event("message");
+          event.data = { topic: "template-error" };
+          event.source = iframe.contentWindow;
+
+          element._handleMessage(event);
+
+          assert.equal(element._sendEvent.calledWith("rise-components-error"), true);
+        });
+
+        test('should not send when message is from a different source', () => {
+          const element = fixture('StaticValueTestFixture');
+          const iframe = element.shadowRoot.children[0];
+
+          const event = new Event("message");
+          event.data = { topic: "template-done" };
+          event.source = {};
+
+          sandbox.stub(element, "_sendMessageToTemplate");
+
+          element._handleMessage(event);
+
+          assert.equal(element._sendMessageToTemplate.called, false);
+        });
+
+        test('should forward attributeData messages to iframe', () => {
+          const element = fixture('StaticValueTestFixture');
+          const iframe = element.shadowRoot.children[0];
+
+          const event = new Event("message");
+          event.data = { type: "attributeData" };
+          event.source = {};
+
+          sandbox.stub(iframe.contentWindow, "postMessage");
+
+          element._handleMessage(event);
+
+          assert.equal(iframe.contentWindow.postMessage.calledWith(event.data, "http://widgets.risevision.com/stable/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html"), true);
+        });
+
+        test('should forward displayData messages to iframe', () => {
+          const element = fixture('StaticValueTestFixture');
+          const iframe = element.shadowRoot.children[0];
+
+          const event = new Event("message");
+          event.data = { type: "displayData" };
+          event.source = {};
+
+          sandbox.stub(iframe.contentWindow, "postMessage");
+
+          element._handleMessage(event);
+
+          assert.equal(iframe.contentWindow.postMessage.calledWith(event.data, "http://widgets.risevision.com/stable/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html"), true);
+        });
+
+        test('should forward sendStartEvent messages to iframe', () => {
+          const element = fixture('StaticValueTestFixture');
+          const iframe = element.shadowRoot.children[0];
+
+          const event = new Event("message");
+          event.data = { type: "sendStartEvent" };
+          event.source = {};
+
+          sandbox.stub(iframe.contentWindow, "postMessage");
+
+          element._handleMessage(event);
+
+          assert.equal(iframe.contentWindow.postMessage.calledWith(event.data, "http://widgets.risevision.com/stable/templates/8d517e618b10991a995e53e334f707fc246de9cc/src/template.html"), true);
+        });
+
+        test('should not forward other messages to iframe', () => {
+          const element = fixture('StaticValueTestFixture');
+          const iframe = element.shadowRoot.children[0];
+
+          const event = new Event("message");
+          event.data = { type: "randomMessage" };
+          event.source = {};
+
+          sandbox.stub(iframe.contentWindow, "postMessage");
+
+          element._handleMessage(event);
+
+          assert.equal(iframe.contentWindow.postMessage.called, false);
         });
 
         test('should calculate level of embedding correctly', () => {

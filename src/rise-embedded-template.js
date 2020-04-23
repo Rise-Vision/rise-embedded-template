@@ -60,11 +60,12 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     const templateStage = this._getHostTemplatePath().startsWith("/staging") ? "staging" : "stable";
 
     const protocol = this._getHostTemplateProtocol();
+    const type = RisePlayerConfiguration.Helpers.getHttpParameter("type");
 
     let url = `${protocol}//widgets.risevision.com/${templateStage}/templates/${templateId}/src/template.html`
 
     if (presentationId) {
-      url = `${url}?presentationId=${presentationId}`;
+      url = `${url}?presentationId=${presentationId}&type=${type}&frameElementId=template_${presentationId}`;
     }
 
     return url;
@@ -95,7 +96,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     this.addEventListener("rise-playlist-play", () => this._play());
     this.addEventListener("rise-playlist-stop", () => this._stop());
 
-    window.addEventListener("message", event => this._handleMessageFromTemplate(event), false);
+    window.addEventListener("message", event => this._handleMessage(event), false);
   }
 
   _play() {
@@ -111,15 +112,20 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   }
 
   _sendMessageToTemplate(message) {
-    console.log(`${this.id} sending ${message.topic} to template`);
+    console.log(`${this.id} sending ${message.topic || message.type} to template`);
     this.$.template.contentWindow.postMessage(message, this.url);
   }
 
-  _handleMessageFromTemplate(event) {
-    if (event.source !== this.$.template.contentWindow) {
-      return;
+  _handleMessage(event) {
+    if (event.source === this.$.template.contentWindow) {
+      this._handleMessageFromTemplate(event);
+    } else if (this.$.template.contentWindow && event.data && 
+      (event.data.type === "attributeData" || event.data.type === "displayData" || event.data.type === "sendStartEvent")) {
+      this._sendMessageToTemplate( event.data );
     }
+  }
 
+  _handleMessageFromTemplate(event) {
     console.log(`${this.id} received ${event.data.topic} from template`);
 
     if (event.data.topic === "template-done") {
@@ -129,6 +135,10 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     if (event.data.topic === "rise-components-ready") {
       this._templateIsReady = true;
       this._sendEvent("rise-components-ready");
+    }
+
+    if (event.data.topic === "template-error") {
+      this._sendEvent("rise-components-error");
     }
   }
 }
