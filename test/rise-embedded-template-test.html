@@ -15,10 +15,10 @@
 
     <script type="text/javascript">
       RisePlayerConfiguration = {
-        isConfigured: () => true,
         isPreview: sinon.stub().returns(true),
         Logger: {},
         Helpers: {
+          getComponentAsync: () => {},
           getHttpParameter: sinon.stub().returns("type")
         }
       };
@@ -187,9 +187,19 @@
           assert.equal(element._sendDoneEvent.called, false);
         });
 
-        test('should send "rise-components-ready" event when template sends it', () => {
+        test('should override _handleStart and call super with skipReady=true flag', () => {
+          sandbox.stub(RiseElement.prototype, "_handleStart");
+
+          const element = fixture('StaticValueTestFixture');
+
+          element._handleStart('event');
+
+          assert.equal(RiseElement.prototype._handleStart.calledWith('event', true), true);
+        });
+
+        test('should _sendReadyEvent event when template sends it', () => {
           // stub super class method
-          sandbox.stub(RiseElement.prototype, "_sendEvent");
+          sandbox.stub(RiseElement.prototype, "_sendReadyEvent");
 
           const element = fixture('StaticValueTestFixture');
           const iframe = element.shadowRoot.children[0];
@@ -200,7 +210,7 @@
 
           element._handleMessage(event);
 
-          assert.equal(element._sendEvent.calledWith("rise-components-ready"), true);
+          assert.equal(element._sendReadyEvent.called, true);
         });
 
         test('should send "rise-components-error" event when template sends it', () => {

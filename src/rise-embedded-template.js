@@ -99,6 +99,10 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     window.addEventListener("message", event => this._handleMessage(event), false);
   }
 
+  _handleStart(event) {
+    super._handleStart( event, true );
+  }
+
   _play() {
     if (this._templateIsReady) {
       this._sendMessageToTemplate({ topic: "rise-presentation-play" })
@@ -134,7 +138,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
 
     if (event.data.topic === "rise-components-ready") {
       this._templateIsReady = true;
-      this._sendEvent("rise-components-ready");
+      super._sendReadyEvent();
     }
 
     if (event.data.topic === "template-error") {
