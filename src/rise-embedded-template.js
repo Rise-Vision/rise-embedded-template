@@ -93,9 +93,6 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   ready() {
     super.ready();
 
-    this.addEventListener("rise-playlist-play", () => this._handleRisePresentationPlay());
-    this.addEventListener("rise-playlist-stop", () => this._handleRisePresentationStop());
-
     window.addEventListener("message", event => this._handleMessage(event), false);
   }
 
