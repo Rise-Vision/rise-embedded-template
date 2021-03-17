@@ -93,8 +93,8 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   ready() {
     super.ready();
 
-    this.addEventListener("rise-playlist-play", () => this._play());
-    this.addEventListener("rise-playlist-stop", () => this._stop());
+    this.addEventListener("rise-playlist-play", () => this._handleRisePresentationPlay());
+    this.addEventListener("rise-playlist-stop", () => this._handleRisePresentationStop());
 
     window.addEventListener("message", event => this._handleMessage(event), false);
   }
@@ -103,13 +103,17 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     super._handleStart( event, true );
   }
 
-  _play() {
+  _handleRisePresentationPlay() {
+    super._handleRisePresentationPlay();
+
     if (this._templateIsReady) {
       this._sendMessageToTemplate({ topic: "rise-presentation-play" })
     }
   }
 
-  _stop() {
+  _handleRisePresentationStop() {
+    super._handleRisePresentationStop();
+
     if (this._templateIsReady) {
       this._sendMessageToTemplate({ topic: "rise-presentation-stop" })
     }
