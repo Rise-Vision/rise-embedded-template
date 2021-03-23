@@ -172,60 +172,6 @@
           });
         });
 
-        suite( "legacy play/stop events", () => {
-          test('should send "rise-presentation-play" to template on "rise-playlist-play" event', () => {
-            const element = fixture('StaticValueTestFixture');
-            const iframe = element.shadowRoot.children[0];
-
-            const event = new Event("message");
-            event.data = { topic: "rise-components-ready" };
-            event.source = iframe.contentWindow;
-            element._handleMessage(event);
-
-            sandbox.stub(element, "_sendMessageToTemplate");
-
-            element.dispatchEvent(new Event("rise-playlist-play"));
-
-            assert.equal(element._sendMessageToTemplate.calledWith({ topic: "rise-presentation-play" }), true);
-          });
-
-          test('should send "rise-presentation-stop" to template on "rise-playlist-stop" event', () => {
-            const element = fixture('StaticValueTestFixture');
-            const iframe = element.shadowRoot.children[0];
-
-            const event = new Event("message");
-            event.data = { topic: "rise-components-ready" };
-            event.source = iframe.contentWindow;
-            element._handleMessage(event);
-
-            sandbox.stub(element, "_sendMessageToTemplate");
-
-            element.dispatchEvent(new Event("rise-playlist-stop"));
-
-            assert.equal(element._sendMessageToTemplate.calledWith({ topic: "rise-presentation-stop" }), true);
-          });
-
-          test('should not "rise-presentation-play" to template on "rise-playlist-play" event if template is not ready', () => {
-            const element = fixture('StaticValueTestFixture');
-
-            sandbox.stub(element, "_sendMessageToTemplate");
-
-            element.dispatchEvent(new Event("rise-playlist-play"));
-
-            assert.equal(element._sendMessageToTemplate.calledWith({ topic: "rise-presentation-play" }), false);
-          });
-
-          test('should not "rise-presentation-stop" to template on "rise-playlist-stop" event if template is not ready', () => {
-            const element = fixture('StaticValueTestFixture');
-
-            sandbox.stub(element, "_sendMessageToTemplate");
-
-            element.dispatchEvent(new Event("rise-playlist-stop"));
-
-            assert.equal(element._sendMessageToTemplate.calledWith({ topic: "rise-presentation-stop" }), false);
-          });
-        });
-
         test('should send "report-done" event when template is done', () => {
           // stub super class method
           sandbox.stub(RiseElement.prototype, "_sendDoneEvent");
