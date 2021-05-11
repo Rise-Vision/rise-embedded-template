@@ -10,20 +10,40 @@ export default class RiseEmbeddedTemplate extends RiseElement {
       <style>
         #previewPlaceholder {
           display: none;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          text-align: center;
           position: absolute;
           left: 0;
           top: 0;
           width: 100%;
           height: 100%;
-          z-index: 1;
-          background-image: url("data:image/svg+xml;charset=utf-8;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNjAgNjAiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICAgICAgICA8ZyBpZD0iMS4tQXRvbXMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgICAgICAgIDxnIGlkPSJEZXNrdG9wL0ljb25zIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNDIzLjAwMDAwMCwgLTEyMzIuMDAwMDAwKSIgZmlsbD0iIzAyMDYyMCIgZmlsbC1ydWxlPSJub256ZXJvIj4KICAgICAgICAgICAgICAgICAgPGcgaWQ9Imljb24tZW1iZWRkZWQtdGVtcGxhdGVzIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MjMuMDAwMDAwLCAxMjMyLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTU1LDAgQzU3LjY4ODc1NDcsMCA1OS44ODE4MTgxLDIuMTIyMzA2NzEgNTkuOTk1MzgwNSw0Ljc4MzExMDM4IEw2MCw1IEw2MCw1NSBDNjAsNTcuNjg4NzU0NyA1Ny44Nzc2OTMzLDU5Ljg4MTgxODEgNTUuMjE2ODg5Niw1OS45OTUzODA1IEw1NSw2MCBMNSw2MCBDMi4zMTEyNDUzLDYwIDAuMTE4MTgxODg1LDU3Ljg3NzY5MzMgMC4wMDQ2MTk1MTM4NSw1NS4yMTY4ODk2IEwwLDU1IEwwLDUgQzAsMi4zMTEyNDUzIDIuMTIyMzA2NzEsMC4xMTgxODE4ODUgNC43ODMxMTAzOCwwLjAwNDYxOTUxMzg1IEw1LDAgTDU1LDAgWiBNNTMuNzUsMzIuNSBMMzMuNzUsMzIuNSBDMzMuMDU5NjQ0MSwzMi41IDMyLjUsMzMuMDU5NjQ0MSAzMi41LDMzLjc1IEwzMi41LDMzLjc1IEwzMi41LDUzLjc1IEMzMi41LDU0LjQ0MDM1NTkgMzMuMDU5NjQ0MSw1NSAzMy43NSw1NSBMMzMuNzUsNTUgTDUzLjc1LDU1IEM1NC40NDAzNTU5LDU1IDU1LDU0LjQ0MDM1NTkgNTUsNTMuNzUgTDU1LDUzLjc1IEw1NSwzMy43NSBDNTUsMzMuMDU5NjQ0MSA1NC40NDAzNTU5LDMyLjUgNTMuNzUsMzIuNSBMNTMuNzUsMzIuNSBaIiBpZD0iU2hhcGUiPjwvcGF0aD4KICAgICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgIDwvZz4KICAgICAgICAgIDwvZz4KICAgICAgICA8L3N2Zz4=");
-          background-position: center;
-          background-repeat: no-repeat;
-          background-size: auto 80px;
           background-color: #F2F2F2;
         }
+        #previewPlaceholder svg {
+          height: 120px;
+          width: 100%;
+        }
+        #previewPlaceholder h1 {
+          color: #020620;
+          font-size: 48px;
+          text-transform: initial;
+          font-family: Helvetica, Arial, sans-serif;
+        }
       </style>
-      <div id="previewPlaceholder"></div>
+      <div id="previewPlaceholder">
+        <svg viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="1.-Atoms" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <g id="Desktop/Icons" transform="translate(-423.000000, -1232.000000)" fill="#020620" fill-rule="nonzero">
+                  <g id="icon-embedded-templates" transform="translate(423.000000, 1232.000000)">
+                      <path d="M55,0 C57.6887547,0 59.8818181,2.12230671 59.9953805,4.78311038 L60,5 L60,55 C60,57.6887547 57.8776933,59.8818181 55.2168896,59.9953805 L55,60 L5,60 C2.3112453,60 0.118181885,57.8776933 0.00461951385,55.2168896 L0,55 L0,5 C0,2.3112453 2.12230671,0.118181885 4.78311038,0.00461951385 L5,0 L55,0 Z M53.75,32.5 L33.75,32.5 C33.0596441,32.5 32.5,33.0596441 32.5,33.75 L32.5,33.75 L32.5,53.75 C32.5,54.4403559 33.0596441,55 33.75,55 L33.75,55 L53.75,55 C54.4403559,55 55,54.4403559 55,53.75 L55,53.75 L55,33.75 C55,33.0596441 54.4403559,32.5 53.75,32.5 L53.75,32.5 Z" id="Shape"></path>
+                  </g>
+              </g>
+          </g>
+        </svg>
+        <h1>Embedded Presentation</h1>
+      </div>
       <iframe
         id="template"
         height="100%"
@@ -69,7 +89,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   _computeUrl(templateId, presentationId) {
 
     if (this._isPreview) {
-      this.$.previewPlaceholder.style.display = "block";
+      this.$.previewPlaceholder.style.display = "flex";
       return "about:blank";
     }
 
