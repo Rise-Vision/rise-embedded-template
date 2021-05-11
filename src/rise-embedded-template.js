@@ -2,9 +2,28 @@ import { html } from "@polymer/polymer";
 import { RiseElement } from "rise-common-component/src/rise-element.js";
 import { version } from "./rise-embedded-template-version.js";
 
+export const DONE_PREVIEW_DELAY = 10 * 1000;
+
 export default class RiseEmbeddedTemplate extends RiseElement {
   static get template() {
     return html`
+      <style>
+        #previewPlaceholder {
+          display: none;
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 1;
+          background-image: url("data:image/svg+xml;charset=utf-8;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNjAgNjAiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICAgICAgICA8ZyBpZD0iMS4tQXRvbXMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgICAgICAgIDxnIGlkPSJEZXNrdG9wL0ljb25zIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNDIzLjAwMDAwMCwgLTEyMzIuMDAwMDAwKSIgZmlsbD0iIzAyMDYyMCIgZmlsbC1ydWxlPSJub256ZXJvIj4KICAgICAgICAgICAgICAgICAgPGcgaWQ9Imljb24tZW1iZWRkZWQtdGVtcGxhdGVzIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MjMuMDAwMDAwLCAxMjMyLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTU1LDAgQzU3LjY4ODc1NDcsMCA1OS44ODE4MTgxLDIuMTIyMzA2NzEgNTkuOTk1MzgwNSw0Ljc4MzExMDM4IEw2MCw1IEw2MCw1NSBDNjAsNTcuNjg4NzU0NyA1Ny44Nzc2OTMzLDU5Ljg4MTgxODEgNTUuMjE2ODg5Niw1OS45OTUzODA1IEw1NSw2MCBMNSw2MCBDMi4zMTEyNDUzLDYwIDAuMTE4MTgxODg1LDU3Ljg3NzY5MzMgMC4wMDQ2MTk1MTM4NSw1NS4yMTY4ODk2IEwwLDU1IEwwLDUgQzAsMi4zMTEyNDUzIDIuMTIyMzA2NzEsMC4xMTgxODE4ODUgNC43ODMxMTAzOCwwLjAwNDYxOTUxMzg1IEw1LDAgTDU1LDAgWiBNNTMuNzUsMzIuNSBMMzMuNzUsMzIuNSBDMzMuMDU5NjQ0MSwzMi41IDMyLjUsMzMuMDU5NjQ0MSAzMi41LDMzLjc1IEwzMi41LDMzLjc1IEwzMi41LDUzLjc1IEMzMi41LDU0LjQ0MDM1NTkgMzMuMDU5NjQ0MSw1NSAzMy43NSw1NSBMMzMuNzUsNTUgTDUzLjc1LDU1IEM1NC40NDAzNTU5LDU1IDU1LDU0LjQ0MDM1NTkgNTUsNTMuNzUgTDU1LDUzLjc1IEw1NSwzMy43NSBDNTUsMzMuMDU5NjQ0MSA1NC40NDAzNTU5LDMyLjUgNTMuNzUsMzIuNSBMNTMuNzUsMzIuNSBaIiBpZD0iU2hhcGUiPjwvcGF0aD4KICAgICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgIDwvZz4KICAgICAgICAgIDwvZz4KICAgICAgICA8L3N2Zz4=");
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: auto 80px;
+          background-color: #F2F2F2;
+        }
+      </style>
+      <div id="previewPlaceholder"></div>
       <iframe
         id="template"
         height="100%"
@@ -49,6 +68,11 @@ export default class RiseEmbeddedTemplate extends RiseElement {
 
   _computeUrl(templateId, presentationId) {
 
+    if (this._isPreview) {
+      this.$.previewPlaceholder.style.display = "block";
+      return "about:blank";
+    }
+
     if (!templateId) {
       return "about:blank";
     }
@@ -69,6 +93,18 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     }
 
     return url;
+  }
+
+  get _isPreview() {
+    // account for the component running in editor preview OR running locally in browser
+    return RisePlayerConfiguration.Helpers.isEditorPreview() || !RisePlayerConfiguration.Helpers.isInViewer();
+  }
+
+  _startDonePreviewTimer() {
+    if (this._donePreviewTimer) {
+      clearTimeout(this._donePreviewTimer);
+    }
+    this._donePreviewTimer = setTimeout( () => super._sendDoneEvent(true), DONE_PREVIEW_DELAY );
   }
 
   _getHostTemplateProtocol() {
@@ -97,11 +133,20 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   }
 
   _handleStart(event) {
+    if (this._isPreview) {
+      super._handleStart( event );
+      return;
+    }
     super._handleStart( event, true );
   }
 
   _handleRisePresentationPlay() {
     super._handleRisePresentationPlay();
+
+    if (this._isPreview) {
+      this._startDonePreviewTimer();
+      return;
+    }
 
     if (this._templateIsReady) {
       this._sendMessageToTemplate({ topic: "rise-presentation-play" })

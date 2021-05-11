@@ -15,9 +15,10 @@
 
     <script type="text/javascript">
       RisePlayerConfiguration = {
-        isPreview: sinon.stub().returns(true),
         Logger: {},
         Helpers: {
+          isEditorPreview: sinon.stub().returns(false),
+          isInViewer:  sinon.stub().returns(true),
           getComponentAsync: () => {},
           getHttpParameter: sinon.stub().returns("type")
         }
@@ -89,7 +90,7 @@
 
         test('should render iframe with template url', () => {
           const element = fixture('StaticValueTestFixture');
-          const object = element.shadowRoot.children[0];
+          const object = element.shadowRoot.children[2];
 
           assert.equal(object.tagName, "IFRAME");
           assert.equal(object.src, element.url);
@@ -97,7 +98,7 @@
 
         test('should load blank url when template-id is cleared', () => {
           const element = fixture('StaticValueTestFixture');
-          const object = element.shadowRoot.children[0];
+          const object = element.shadowRoot.children[2];
 
           element.templateId = "";
           assert.equal(object.src, "about:blank");
@@ -126,7 +127,7 @@
           });
 
           test('should send "rise-presentation-play" to template on "rise-presentation-play" event', () => {
-            const iframe = element.shadowRoot.children[0];
+            const iframe = element.shadowRoot.children[2];
 
             const event = new Event("message");
             event.data = { topic: "rise-components-ready" };
@@ -141,7 +142,7 @@
           });
 
           test('should send "rise-presentation-stop" to template on "rise-presentation-stop" event', () => {
-            const iframe = element.shadowRoot.children[0];
+            const iframe = element.shadowRoot.children[2];
 
             const event = new Event("message");
             event.data = { topic: "rise-components-ready" };
@@ -177,7 +178,7 @@
           sandbox.stub(RiseElement.prototype, "_sendDoneEvent");
 
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { topic: "template-done" };
@@ -193,7 +194,7 @@
           sandbox.stub(RiseElement.prototype, "_sendDoneEvent");
 
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { topic: "other-topic" };
@@ -219,7 +220,7 @@
           sandbox.stub(RiseElement.prototype, "_sendReadyEvent");
 
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { topic: "rise-components-ready" };
@@ -235,7 +236,7 @@
           sandbox.stub(RiseElement.prototype, "_sendEvent");
 
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { topic: "template-error" };
@@ -248,7 +249,7 @@
 
         test('should not send when message is from a different source', () => {
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { topic: "template-done" };
@@ -263,7 +264,7 @@
 
         test('should forward attributeData messages to iframe', () => {
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { type: "attributeData" };
@@ -278,7 +279,7 @@
 
         test('should forward displayData messages to iframe', () => {
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { type: "displayData" };
@@ -293,7 +294,7 @@
 
         test('should forward sendStartEvent messages to iframe', () => {
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { type: "sendStartEvent" };
@@ -308,7 +309,7 @@
 
         test('should not forward other messages to iframe', () => {
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { type: "randomMessage" };
