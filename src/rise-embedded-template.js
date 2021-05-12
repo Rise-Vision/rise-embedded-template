@@ -116,8 +116,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   }
 
   get _isPreview() {
-    // account for the component running in editor preview OR running locally in browser
-    return RisePlayerConfiguration.Helpers.isEditorPreview() || !RisePlayerConfiguration.Helpers.isInViewer();
+    return RisePlayerConfiguration && RisePlayerConfiguration.Helpers.isEditorPreview();
   }
 
   _startDonePreviewTimer() {
