@@ -2,9 +2,48 @@ import { html } from "@polymer/polymer";
 import { RiseElement } from "rise-common-component/src/rise-element.js";
 import { version } from "./rise-embedded-template-version.js";
 
+export const DONE_PREVIEW_DELAY = 10 * 1000;
+
 export default class RiseEmbeddedTemplate extends RiseElement {
   static get template() {
     return html`
+      <style>
+        #previewPlaceholder {
+          display: none;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          text-align: center;
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background-color: #F2F2F2;
+        }
+        #previewPlaceholder svg {
+          height: 120px;
+          width: 100%;
+        }
+        #previewPlaceholder h1 {
+          color: #020620;
+          font-size: 48px;
+          text-transform: initial;
+          font-family: Helvetica, Arial, sans-serif;
+        }
+      </style>
+      <div id="previewPlaceholder">
+        <svg viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="1.-Atoms" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <g id="Desktop/Icons" transform="translate(-423.000000, -1232.000000)" fill="#020620" fill-rule="nonzero">
+                  <g id="icon-embedded-templates" transform="translate(423.000000, 1232.000000)">
+                      <path d="M55,0 C57.6887547,0 59.8818181,2.12230671 59.9953805,4.78311038 L60,5 L60,55 C60,57.6887547 57.8776933,59.8818181 55.2168896,59.9953805 L55,60 L5,60 C2.3112453,60 0.118181885,57.8776933 0.00461951385,55.2168896 L0,55 L0,5 C0,2.3112453 2.12230671,0.118181885 4.78311038,0.00461951385 L5,0 L55,0 Z M53.75,32.5 L33.75,32.5 C33.0596441,32.5 32.5,33.0596441 32.5,33.75 L32.5,33.75 L32.5,53.75 C32.5,54.4403559 33.0596441,55 33.75,55 L33.75,55 L53.75,55 C54.4403559,55 55,54.4403559 55,53.75 L55,53.75 L55,33.75 C55,33.0596441 54.4403559,32.5 53.75,32.5 L53.75,32.5 Z" id="Shape"></path>
+                  </g>
+              </g>
+          </g>
+        </svg>
+        <h1>Embedded Presentation</h1>
+      </div>
       <iframe
         id="template"
         height="100%"
@@ -49,6 +88,11 @@ export default class RiseEmbeddedTemplate extends RiseElement {
 
   _computeUrl(templateId, presentationId) {
 
+    if (this._isPreview) {
+      this.$.previewPlaceholder.style.display = "flex";
+      return "about:blank";
+    }
+
     if (!templateId) {
       return "about:blank";
     }
@@ -69,6 +113,17 @@ export default class RiseEmbeddedTemplate extends RiseElement {
     }
 
     return url;
+  }
+
+  get _isPreview() {
+    return RisePlayerConfiguration && RisePlayerConfiguration.Helpers.isEditorPreview();
+  }
+
+  _startDonePreviewTimer() {
+    if (this._donePreviewTimer) {
+      clearTimeout(this._donePreviewTimer);
+    }
+    this._donePreviewTimer = setTimeout( () => super._sendDoneEvent(true), DONE_PREVIEW_DELAY );
   }
 
   _getHostTemplateProtocol() {
@@ -97,11 +152,20 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   }
 
   _handleStart(event) {
+    if (this._isPreview) {
+      super._handleStart( event );
+      return;
+    }
     super._handleStart( event, true );
   }
 
   _handleRisePresentationPlay() {
     super._handleRisePresentationPlay();
+
+    if (this._isPreview) {
+      this._startDonePreviewTimer();
+      return;
+    }
 
     if (this._templateIsReady) {
       this._sendMessageToTemplate({ topic: "rise-presentation-play" })

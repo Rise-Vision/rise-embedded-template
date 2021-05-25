@@ -15,7 +15,6 @@
 
     <script type="text/javascript">
       RisePlayerConfiguration = {
-        isPreview: sinon.stub().returns(true),
         Logger: {},
         Helpers: {
           getComponentAsync: () => {},
@@ -42,6 +41,8 @@
         const sandbox = sinon.createSandbox();
 
         setup(()=>{
+          RisePlayerConfiguration.Helpers.isEditorPreview = sandbox.stub().returns(false);
+
           RisePlayerConfiguration.Logger.info = sandbox.spy();
           RisePlayerConfiguration.Logger.warning = sandbox.spy();
           RisePlayerConfiguration.Logger.error = sandbox.spy();
@@ -89,7 +90,7 @@
 
         test('should render iframe with template url', () => {
           const element = fixture('StaticValueTestFixture');
-          const object = element.shadowRoot.children[0];
+          const object = element.shadowRoot.children[2];
 
           assert.equal(object.tagName, "IFRAME");
           assert.equal(object.src, element.url);
@@ -97,10 +98,35 @@
 
         test('should load blank url when template-id is cleared', () => {
           const element = fixture('StaticValueTestFixture');
-          const object = element.shadowRoot.children[0];
+          const object = element.shadowRoot.children[2];
 
           element.templateId = "";
           assert.equal(object.src, "about:blank");
+        });
+
+        test('should render placeholder if in Editor Preview', () => {
+          RisePlayerConfiguration.Helpers.isEditorPreview.returns(true);
+
+          const element = fixture('StaticValueTestFixture');
+          const iframe = element.shadowRoot.children[2];
+
+          const url = element._computeUrl();
+          assert.equal(element.$.previewPlaceholder.style.display, "flex");
+          assert.equal(url, "about:blank");
+        });
+
+        suite( '_isPreview', () => {
+          test('should return true if in Editor Preview', () => {
+            RisePlayerConfiguration.Helpers.isEditorPreview.returns(true);
+            const element = fixture('StaticValueTestFixture');
+            assert.isTrue(element._isPreview);
+          });
+
+          test('should return false if not in Editor Preview', () => {
+            RisePlayerConfiguration.Helpers.isEditorPreview.returns(false);
+            const element = fixture('StaticValueTestFixture');
+            assert.isFalse(element._isPreview);
+          });
         });
 
         suite( "play/stop events", () => {
@@ -126,7 +152,7 @@
           });
 
           test('should send "rise-presentation-play" to template on "rise-presentation-play" event', () => {
-            const iframe = element.shadowRoot.children[0];
+            const iframe = element.shadowRoot.children[2];
 
             const event = new Event("message");
             event.data = { topic: "rise-components-ready" };
@@ -141,7 +167,7 @@
           });
 
           test('should send "rise-presentation-stop" to template on "rise-presentation-stop" event', () => {
-            const iframe = element.shadowRoot.children[0];
+            const iframe = element.shadowRoot.children[2];
 
             const event = new Event("message");
             event.data = { topic: "rise-components-ready" };
@@ -170,6 +196,15 @@
 
             assert.equal(element._sendMessageToTemplate.calledWith({ topic: "rise-presentation-stop" }), false);
           });
+
+          test('should start Done timer when in Preview and "rise-presentation-play" is received', () => {
+            sandbox.stub(element, "_startDonePreviewTimer");
+            RisePlayerConfiguration.Helpers.isEditorPreview.returns(true);
+
+            element.dispatchEvent(new Event("rise-presentation-play"));            
+
+            assert.isTrue(element._startDonePreviewTimer.called);
+          });
         });
 
         test('should send "report-done" event when template is done', () => {
@@ -177,7 +212,7 @@
           sandbox.stub(RiseElement.prototype, "_sendDoneEvent");
 
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { topic: "template-done" };
@@ -193,7 +228,7 @@
           sandbox.stub(RiseElement.prototype, "_sendDoneEvent");
 
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { topic: "other-topic" };
@@ -214,12 +249,24 @@
           assert.equal(RiseElement.prototype._handleStart.calledWith('event', true), true);
         });
 
+        test('should override _handleStart and call super without skipReady flag when in Preview', () => {
+          RisePlayerConfiguration.Helpers.isEditorPreview.returns(true);
+
+          sandbox.stub(RiseElement.prototype, "_handleStart");
+
+          const element = fixture('StaticValueTestFixture');
+
+          element._handleStart('event');
+
+          assert.equal(RiseElement.prototype._handleStart.calledWith('event'), true);
+        });
+
         test('should _sendReadyEvent event when template sends it', () => {
           // stub super class method
           sandbox.stub(RiseElement.prototype, "_sendReadyEvent");
 
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { topic: "rise-components-ready" };
@@ -235,7 +282,7 @@
           sandbox.stub(RiseElement.prototype, "_sendEvent");
 
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { topic: "template-error" };
@@ -248,7 +295,7 @@
 
         test('should not send when message is from a different source', () => {
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { topic: "template-done" };
@@ -263,7 +310,7 @@
 
         test('should forward attributeData messages to iframe', () => {
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { type: "attributeData" };
@@ -278,7 +325,7 @@
 
         test('should forward displayData messages to iframe', () => {
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { type: "displayData" };
@@ -293,7 +340,7 @@
 
         test('should forward sendStartEvent messages to iframe', () => {
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { type: "sendStartEvent" };
@@ -308,7 +355,7 @@
 
         test('should not forward other messages to iframe', () => {
           const element = fixture('StaticValueTestFixture');
-          const iframe = element.shadowRoot.children[0];
+          const iframe = element.shadowRoot.children[2];
 
           const event = new Event("message");
           event.data = { type: "randomMessage" };
@@ -362,6 +409,52 @@
           const element = fixture('StaticValueTestFixture');
 
           assert.equal(element.url, 'data:text/html;charset=utf-8,<html><body>Maximum level of embedding is reached</body></html>');
+        });
+
+        suite('_startDonePreviewTimer', () => {
+          let clock;
+        
+          setup(() => {
+            clock = sandbox.useFakeTimers();
+          });
+
+          test('should send Done after 10 seconds', () => {
+            const element = fixture('StaticValueTestFixture');
+            sandbox.stub(RiseElement.prototype, "_sendDoneEvent");
+
+            element._startDonePreviewTimer();
+
+            assert.isFalse(element._sendDoneEvent.called);
+
+            clock.tick(1000 * 5);
+
+            assert.isFalse(element._sendDoneEvent.called);
+
+            clock.tick(1000 * 5);
+
+            assert.isTrue(element._sendDoneEvent.calledWith(true));
+          });
+
+          test('should clear existing timers', () => {
+            const element = fixture('StaticValueTestFixture');
+            sandbox.stub(RiseElement.prototype, "_sendDoneEvent");
+
+            element._startDonePreviewTimer();
+
+            assert.isFalse(element._sendDoneEvent.called);
+
+            clock.tick(1000 * 5);
+
+            element._startDonePreviewTimer();
+
+            clock.tick(1000 * 5);
+
+            assert.isFalse(element._sendDoneEvent.called);
+
+            clock.tick(1000 * 5);
+
+            assert.isTrue(element._sendDoneEvent.calledWith(true));
+          });
         });
 
       });
