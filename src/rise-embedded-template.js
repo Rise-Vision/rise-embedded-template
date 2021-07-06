@@ -105,11 +105,13 @@ export default class RiseEmbeddedTemplate extends RiseElement {
 
     const protocol = this._getHostTemplateProtocol();
     const type = RisePlayerConfiguration.Helpers.getHttpParameter("type");
+    const companyId = RisePlayerConfiguration.getCompanyId();
+    const displayId = RisePlayerConfiguration.getDisplayId();
 
     let url = `${protocol}//widgets.risevision.com/${templateStage}/templates/${templateId}/src/template.html`
 
     if (presentationId) {
-      url = `${url}?presentationId=${presentationId}&type=${type}&frameElementId=template_${presentationId}`;
+      url = `${url}?presentationId=${presentationId}&type=${type}&frameElementId=template_${presentationId}&cid=${companyId}&id=${displayId}`;
     }
 
     return url;
@@ -188,7 +190,7 @@ export default class RiseEmbeddedTemplate extends RiseElement {
   _handleMessage(event) {
     if (event.source === this.$.template.contentWindow) {
       this._handleMessageFromTemplate(event);
-    } else if (this.$.template.contentWindow && event.data && 
+    } else if (this.$.template.contentWindow && event.data &&
       (event.data.type === "attributeData" || event.data.type === "displayData" || event.data.type === "sendStartEvent")) {
       this._sendMessageToTemplate( event.data );
     }
